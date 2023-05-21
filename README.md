@@ -72,4 +72,8 @@ where: 0.0.0.0 IP address(use what you want) and 8001 is port number
 - admin http://127.0.0.1:8000/admin
 
 
+## general note
+
+- the site now only responsive for desktop and mobile
+
 ## Thanks for your time
