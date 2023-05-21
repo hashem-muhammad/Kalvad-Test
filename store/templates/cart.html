@@ -1,0 +1,131 @@
+{% extends 'base.html' %} {% block content %}
+{%load static%}
+
+
+<div class="shoppingCart">
+  
+  <h2>My Cart</h2>
+
+  <div class="heading">
+    <div class="p_name"><h4 class="head_name">Product's Name</h4></div>
+    <div class="name"><h4 class="head_name">Quantity</h4></div>
+    <div class="name"><h4 class="head_name">Unit (KG)</h4></div>
+    <div class="name"><h4 class="head_name">Total</h4></div>
+  </div>
+
+  <div class="itemContainer">
+    {% for item in items %}
+    
+
+    <div class="deleteContainer" id="update">
+      <div class="item" id="">
+        <div class="iteminfo">
+          <div class="p_img">
+            <img src="{{item.product.picture.url}}" alt="" />
+          </div>
+          <p>{{item.product.name}}</p>
+        </div>
+
+        <div class="name"><input id="quantity{{item.product.id}}" class="inputqyt" onblur="updateCart('{{item.product.id}}')"  value="{{item.quantity}}" type="number"></div>
+        <div class="name"><p>{{item.product.price}} <small>AED</small></p></div>
+        <div class="name"><p id="sub_price">{{item.price}} <small>AED</small></p></div>
+    
+      </div>
+    </div>
+
+    <script>
+
+      function getValue(product_id) {
+          let inputField = document.getElementById("quantity" + product_id);
+          let value = inputField.value;
+          return value;
+        }
+      
+      
+      function updateCart(product_id){
+          let url = "/update_cart"
+      
+          let value = getValue(product_id)
+          console.log(value)
+      
+          let data = {product_id:product_id, qty:value, type:'qty'}
+      
+          fetch(url, {
+              method: "POST",
+              headers: {"Content-Type":"application/json", 'X-CSRFToken': csrftoken},
+              body: JSON.stringify(data)
+          })
+          .then(res=>res.json())
+          .then(data=>{
+              document.getElementById("num_of_items").innerHTML = data.num_of_item
+              document.getElementById("total_price").innerHTML ='Grand-Total:' + data.total_price
+              document.getElementById("sub_price").innerHTML = data.price + " "  + '<small>AED</small>'
+              if(data.error){
+                  alert(data.error)
+              }
+          })
+          .catch(error=>{
+              console.log(error)
+          })
+      }
+  </script>
+    
+
+    {% endfor %}
+  </div>
+
+  <div class="pay-section" id="pay-section">
+    <h3 id="total_price">Grand-Total: {{cart.total_price}} <small>AED</small></h3>
+    <button class="Paybutton" onclick = "makePayment()" >Pay</button>
+  </div>
+</div>
+
+<script src="{% static 'js/script.js' %}"></script>
+
+
+
+
+<script>
+
+let cart_total = "{{cart.total_price}}"
+let cart_id = "{{cart.id}}"
+
+
+
+function makePayment() {
+  if(cart_total > 0){
+    let url = "/update_cart";
+    let data = {type: "payment_confirm" };
+    const csrftoken = getCookie('csrftoken');
+
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": csrftoken },
+      body: JSON.stringify(data),
+  })
+      .then((res) => res.json())
+      .then((data) => {
+         
+          document.getElementById("pay-section").innerHTML = 'Payment Done'
+          window.location.reload();
+          
+      })
+      .catch((error) => {
+          console.log(error);
+      });
+
+  
+    
+  }else{
+    document.getElementById("pay-section").innerHTML = "Please Add At Lest One Product"
+  }
+
+}
+
+
+  
+
+</script>
+
+{% endblock content %}
+
