@@ -20,9 +20,11 @@
     <div class="deleteContainer" id="update">
       <div class="item" id="">
         <div class="iteminfo">
+          {%if item.product.picture%}
           <div class="p_img">
             <img src="{{item.product.picture.url}}" alt="" />
           </div>
+          {%endif%}
           <p>{{item.product.name}}</p>
         </div>
 
